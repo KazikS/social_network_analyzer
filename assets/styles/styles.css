@@ -1,0 +1,137 @@
+header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: #dbdbdb;
+}
+header img {
+  width: 150px;
+  height: auto;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-Black.eot");
+  src: url("../../fonts/Montserrat/Montserrat-Black.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-Black.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-Black.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-ExtraLight.eot");
+  src: url("../../fonts/Montserrat/Montserrat-ExtraLight.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-ExtraLight.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-ExtraLight.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-Bold.eot");
+  src: url("../../fonts/Montserrat/Montserrat-Bold.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-Bold.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-Bold.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-Thin.eot");
+  src: url("../../fonts/Montserrat/Montserrat-Thin.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-Thin.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-Thin.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-ExtraBold.eot");
+  src: url("../../fonts/Montserrat/Montserrat-ExtraBold.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-ExtraBold.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-ExtraBold.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-ExtraBold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../fonts/Montserrat/Montserrat-SemiBold.eot");
+  src: url("../../fonts/Montserrat/Montserrat-SemiBold.eot?#iefix") format("embedded-opentype"), url("../../fonts/Montserrat/Montserrat-SemiBold.woff2") format("woff2"), url("../../fonts/Montserrat/Montserrat-SemiBold.woff") format("woff"), url("../../fonts/Montserrat/Montserrat-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  background-color: #dbdbdb;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 15px auto;
+}
+.info-card span {
+  width: 400px;
+}
+.info-card .footnote {
+  display: grid;
+  width: 100%;
+}
+.info-card .footnote span {
+  font-size: 10px;
+  justify-self: end;
+}
+
+.content {
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin: 10px 20px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.content .content-body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+.content input {
+  border: 1px solid black;
+  border-radius: 7px;
+  padding: 2px 5px;
+  width: 390px;
+  height: 20px;
+  margin-bottom: 5px;
+}
+.content .analyze-btn {
+  transition: all;
+  transition-duration: 0.2s;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid black;
+  margin: 10px auto;
+}
+.content .analyze-btn:hover {
+  width: 400px;
+  height: 30px;
+}
+.content .analyze-btn:active {
+  background-color: #dbdbdb;
+}
+.content header {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-bottom: 20px;
+}
+.content header img {
+  width: 25px;
+  height: auto;
+}
+
+/*# sourceMappingURL=styles.css.map */

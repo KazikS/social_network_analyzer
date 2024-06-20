@@ -1,0 +1,25 @@
+{
+  "name": "social-media-analyzer",
+  "version": "1.0.0",
+  "description": "app for analyze social networks for Press and Mass Communications Committee",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KazikS/social-media-analyze.git"
+  },
+  "author": "sabkazz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KazikS/social-media-analyze/issues"
+  },
+  "homepage": "https://github.com/KazikS/social-media-analyze#readme",
+  "devDependencies": {
+    "electron": "^31.0.1"
+  },
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
+}

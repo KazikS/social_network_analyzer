@@ -1,0 +1,31 @@
+let analyzeVKbtn = document.querySelector('.analyze-vk');
+let analyzeTGbtn = document.querySelector('.analyze-tg');
+
+analyzeVKbtn.onclick = () => {
+  const url = document.querySelector('.vk-url').value;
+  const date = document.querySelector('.vk-date').value.split(' ');
+  let startDate = date[1];
+  let endDate = date[3];
+  console.log('VK Button Clicked. URL:', url, 'Start Date:', startDate, 'End Date:', endDate);  // Логируем клик и даты
+  analyzeStats(url, startDate, endDate);
+}
+
+analyzeTGbtn.onclick = () => {
+  const url = document.querySelector('.tg-url').value;
+  const date = document.querySelector('.tg-date').value.split(' ');
+  let startDate = date[1];
+  let endDate = date[3];
+  console.log('TG Button Clicked. URL:', url, 'Start Date:', startDate, 'End Date:', endDate);  // Логируем клик и даты
+  analyzeStats(url, startDate, endDate);
+}
+
+async function analyzeStats(url, startDate, endDate) {
+  const result = await window.electronAPI.analyze({ url, startDate, endDate });
+  
+  if (url.includes("vk.com")) {
+    document.getElementById('vkPosts').textContent = "Количество постов: " + result.filteredPosts.length;
+    document.getElementById('vkLikes').textContent = "Количество лайков: " + result.totalLikes;
+    document.getElementById('vkViews').textContent = "Количество просмотров: " + result.totalViews;
+    document.getElementById('vkAvgPostsPerWeek').textContent = "Среднее количество публикаций в неделю: " + result.avgPostsPerWeek.toFixed(2);
+  }
+}

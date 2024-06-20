@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ социальных сетей</title>
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+</head>
+<body>
+    <header>
+        <img src="./assets/img/logo.png" alt="">
+    </header>
+    <main>
+
+        <div class="info-card">
+            <span>Для проведения анализа социальных сетей следуйте инструкциям, указанным в полях ввода</span>
+            <span>В результате будут получены: количество постов, лайков<sup>*</sup>, просмотров<sup>*</sup>, среднее количество публикаций в неделю<sup>*</sup></span>
+            <div class="footnote">
+                <span><sup>*</sup> - находится в разработке</span>
+            </div>
+        </div>
+
+        <div class="vk content">
+            <header>
+                <img src="./assets/img/vk_logo.svg" alt=""><span>ВКонтакте</span>
+            </header>
+            <div class="content-body">
+                <div class="inputs">
+                    <input type="text" placeholder="Вставьте URL на группу ВКонтакте" class="vk-url">
+                    <input type="text" placeholder="Введите даты в формате: 'с YYYY-MM-DD до YYYY-MM-DD'" class="vk-date">
+                </div>
+                <div class="results">
+                    <h3>Результаты:</h3>
+                    <p id="vkPosts">Количество постов: </p>
+                    <p id="vkLikes">Количество лайков: </p>
+                    <p id="vkViews">Количество просмотров: </p>
+                    <p id="vkAvgPostsPerWeek">Среднее количество публикаций в неделю: </p>
+                </div>
+            </div>
+            <div class="subs-dynamic">
+                <h3>Динамика подписчиков</h3>
+                <p>В позапрошлом месяце: </p>
+                <p>В прошлом месяце: </p>
+                <p>В этом месяце: </p>
+            </div>
+            <input type="button" value="Анализ" class="analyze-vk analyze-btn">
+        </div>
+
+        <div class="tg content">
+            <header>
+                <img src="./assets/img/telegram-logo.svg" alt=""><span>Telegram</span>
+            </header>
+            <div class="content-body">
+                <div class="inputs">
+                    <input type="text" placeholder="Вставьте URL на канал в Telegram" class="tg-url">
+                    <input type="text" placeholder="Введите даты в формате: 'с YYYY-MM-DD до YYYY-MM-DD'" class="tg-date">
+                </div>
+                
+                <div class="results">
+                    <h3>Результаты:</h3>
+                    <p class="tg-res-1">Количество постов: </p>
+                    <p class="tg-res-2">Количество реакций: </p>
+                    <p class="tg-res-3">Количество просмотров: </p>
+                    <p class="tg-res-4">Среднее количество публикаций в неделю: </p>
+                </div>
+                
+            </div>
+            <div class="subs-dynamic">
+                <h3>Динамика подписчиков</h3>
+                <p>В позапрошлом месяце: </p>
+                <p>В прошлом месяце: </p>
+                <p>В этом месяце: </p>
+            </div>
+            <input type="button" value="Анализ" class="analyze-tg analyze-btn">
+        </div>
+    </main>
+    <script src="renderer.js"></script>
+</body>
+</html>
