@@ -1,7 +1,10 @@
 let analyzeVKbtn = document.querySelector('.analyze-vk');
 let analyzeTGbtn = document.querySelector('.analyze-tg');
+let vkLoad = document.querySelector('.vk-load');
 
 analyzeVKbtn.onclick = () => {
+  vkLoad.style.display = 'block';
+  vkLoad.classList.add('spinning');
   const url = document.querySelector('.vk-url').value;
   const date = document.querySelector('.vk-date').value.split(' ');
   let startDate = date[1];
@@ -27,5 +30,7 @@ async function analyzeStats(url, startDate, endDate) {
     document.getElementById('vkLikes').textContent = "Количество лайков: " + result.totalLikes;
     document.getElementById('vkViews').textContent = "Количество просмотров: " + result.totalViews;
     document.getElementById('vkAvgPostsPerWeek').textContent = "Среднее количество публикаций в неделю: " + result.avgPostsPerWeek.toFixed(2);
+    vkLoad.classList.remove('spinning');
+    vkLoad.style.display = 'none';
   }
 }

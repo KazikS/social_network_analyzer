@@ -45,16 +45,18 @@ ipcMain.handle("analyze", async (event, { url, startDate, endDate }) => {
   }
 });
 
+
 async function analyzeVK(url, startDate, endDate) {
   const token =
     "7554f5227554f5227554f52203764c3153775547554f522132675fa2997f7d1e937998d"; 
   const apiVersion = "5.131";
-  const groupId = extractGroupId(url, token, apiVersion);
+  const groupId = await extractGroupId(url, token, apiVersion);
   let offset = 0;
   let count = 100;
   let allPosts = [];
   let hasMorePosts = true;
   let likes = 0;
+  console.log(groupId);
   while (hasMorePosts) {
     const response = await axios.get(`https://api.vk.com/method/wall.get`, {
       params: {
@@ -110,6 +112,17 @@ async function analyzeVK(url, startDate, endDate) {
   return { filteredPosts, totalLikes, totalViews, avgPostsPerWeek };
 }
 
+
+
+
+async function analyzeTg(){
+  
+}
+
+
+
+
+
 async function extractGroupId(url, token, apiVersion) {
   const match = url.match(/vk\.com\/(?:public|club)(\d+)/);
   if (match) {
@@ -120,8 +133,6 @@ async function extractGroupId(url, token, apiVersion) {
   if (!groupName) {
     throw new Error("Invalid group URL");
   }
-
-  try {
     const response = await axios.get(
       "https://api.vk.com/method/groups.getById",
       {
@@ -132,5 +143,6 @@ async function extractGroupId(url, token, apiVersion) {
         },
       }
     );
-  } catch (error) {}
+    const groupId = response.data.response[0].id
+    return groupId;
 }

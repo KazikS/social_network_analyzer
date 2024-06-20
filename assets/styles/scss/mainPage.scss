@@ -17,6 +17,18 @@
     }
 }
 
+.animated{
+    transition: all;
+    transition-duration: .2s;
+}
+
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+.spinning{
+    animation: spin 1s linear infinite;
+}
 .content {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -27,8 +39,23 @@
     .content-body{
         display: flex;
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
+    }
+    .results{
+        margin-right: 5%;
+        img{
+            width: 20px;
+            height: auto;
+            margin-top: 5%;
+            display: none;
+        }
+    }
+    .inputs{
+        margin-left: 2%;
+        input{
+            width: 120%;
+        }
     }
     input {
         border: 1px solid black;
@@ -39,15 +66,14 @@
         margin-bottom: 5px;
     }
     .analyze-btn{
-        transition: all;
-        transition-duration: 0.2s;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         border: 1px solid black;
         margin: 10px auto;
+        height: 30px;
     }
     .analyze-btn:hover{
         width: 400px;
-        height: 30px;
+        height: 45px;
     }
     .analyze-btn:active{
         background-color: $main-bgcolor;
