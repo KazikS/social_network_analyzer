@@ -21,6 +21,13 @@
     transition: all;
     transition-duration: .2s;
 }
+.btn{
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid black;
+    border-radius: 7px;
+    margin: 10px auto;
+    height: 30px;
+}
 
 .btn:hover{
     width: 400px;
@@ -72,12 +79,7 @@
         height: 20px;
         margin-bottom: 5px;
     }
-    .btn{
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        border: 1px solid black;
-        margin: 10px auto;
-        height: 30px;
-    }
+
 
     header{
         display: flex;
@@ -92,6 +94,20 @@
 }
 .tg{
     position: relative;
+    .tg-password {
+        z-index: 1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 20px;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
     .auth-form-tg{
         color: rgb(217, 214, 214);
         position: absolute;
@@ -114,6 +130,9 @@
         }
         p{
             color: rgb(250, 245, 0);
+            display: none;
+        }
+        .confirm_code{
             display: none;
         }
     }

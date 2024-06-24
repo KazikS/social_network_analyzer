@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';">
     <title>Анализ социальных сетей</title>
     <link rel="stylesheet" href="./assets/styles/styles.css">
 </head>
@@ -51,23 +52,29 @@
             <input type="button" value="Анализ" class="analyze-vk analyze-btn animated">
         </div>
 
+
         <div class="tg content">
             <header>
                 <img src="./assets/img/telegram-logo.svg" alt=""><span>Telegram</span>
             </header>
+            
             <div class="content-body">
                 <div class="auth-form-tg">
                     <h2>Для отслеживания статистики в телеграм авторизируйтесь</h2>
                     <div class="phone">
                         <label for="online_phone">Номер телефона (без пробелов или иных символов)</label>
-                        <input id="online_phone" name="phone" type="text" maxlength="50" value="+7" required="required">
+                        <input id="online_phone" name="phone" type="text" maxlength="50" value="+7">
                     </div>
                     <div class="code">
                         <label for="code">Введите код подтверждения</label>
-                        <input id="code" name="code" type="text" maxlength="50" required="required" placeholder="XXXXX"
-                            disabled>
+                        <input id="code" name="code" type="text" maxlength="50" placeholder="XXXXX" disabled>
+                    </div>
+                    <div class="password">
+                        <label for="password">Введите пароль</label>
+                        <input id="password" name="password" type="password" maxlength="50" placeholder="" disabled>
                     </div>
                     <input type="button" value="Отправить код" class="confirm_phone btn animated">
+                    <input type="button" value="Войти" class="confirm_code btn animated">
                     <p class="undefined-number">Аккаунта с этим номером не существует!</p>
                 </div>
                 <div class="inputs">

@@ -5,48 +5,14 @@ let tgLoad = document.querySelector(".tg-load");
 let confirmPhoneBtn = document.querySelector(".confirm_phone");
 let isVerifCodeIn = false;
 let verifCode = document.querySelector(".confirm_code");
+let confirmPasswordBtn = document.querySelector(".confirm_password");
 
+verifCode.onclick = async () => {
+  const phoneNumber = document.getElementById("online_phone").value;
+  const code = document.getElementById("code").value;
+  const password = document.getElementById("password");
 
-confirmPhoneBtn.onclick = async () => {
-  let phoneNumber = document.getElementById("online_phone").value;
-  console.log(phoneNumber);
-  try {
-    const phoneCodeHash = await window.electronAPI.access_phone(phoneNumber);
-    localStorage.setItem("phoneCodeHash", phoneCodeHash);
-    alert("Код подтверждения отправлен на номер телефона");
-    document.getElementById("code").disabled = false;
-    confirmPhoneBtn.value = "Войти";
-    confirmPhoneBtn.classList.add("confirm_code");
-  } catch (error) {
-    document.querySelector(".undefined-number").style.display = "block";
-    console.error("Error:", error);
-    throw error;
-  }
 };
-
-if (verifCode) {
-  console.log('veriffffffff')
-  if (verifCode) {
-    verifCode.onclick = async () => {
-      const phoneNumber = document.getElementById("online-phone").value;
-      const code = document.getElementById("code").value;
-      const phoneCodeHash = localStorage.getItem("phoneCodeHash");
-      try {
-        const result = await window.electronAPI.access_code({
-          phoneNumber,
-          phoneCodeHash,
-          code,
-        });
-        document.querySelector(".auth-form-tg").style.display = "none";
-        return result;
-      } catch (error) {
-        document.querySelector(".undefined-number").style.display = "block";
-        document.querySelector(".undefined-number").textContent =
-          "Код подтверждения неверен!";
-      }
-    };
-  }
-}
 
 analyzeVKbtn.onclick = () => {
   vkLoad.style.display = "block";

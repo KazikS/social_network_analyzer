@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 const axios = require("axios");
 const MTProto = require("@mtproto/core");
-const { channel } = require("node:diagnostics_channel");
+const { sign } = require("node:crypto");
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -112,68 +112,112 @@ async function analyzeVK(url, startDate, endDate) {
 
 //telegram
 
-ipcMain.handle("access_phone", async (event, phoneNumber) => {
-  const api_id = 29974513;
-  const api_hash = "0f843f086acdbf04af970bf4ab305768";
+const api_id = 29974513;
+const api_hash = "0f843f086acdbf04af970bf4ab305768";
+const mtproto = new MTProto({
+  api_id: api_id,
+  api_hash: api_hash,
+  storageOptions: {
+    path: path.resolve(__dirname, "session.json"),
+  },
+});
 
-  const mtproto = new MTProto({
-    api_id: api_id,
-    api_hash: api_hash,
-    storageOptions: {
-      path: path.resolve(__dirname, "session.json"),
-    },
-  });
+async function getUser() {
   try {
-    const result = await mtproto.call("auth.sendCode", {
-      phone_number: phoneNumber,
-      settings: {
-        _: "codeSettings",
+    const user = await mtproto.call("users.getFullUser", {
+      id: {
+        _: "inputUserSelf",
       },
     });
-    return result.phone_code_hash;
-  } catch (e) {
-    throw e;
+
+    return user;
+  } catch (error) {
+    return null;
+  }
+}
+
+function sendCode(phone) {
+  return mtproto.call("auth.sendCode", {
+    phone_number: phone,
+    settings: {
+      _: "codeSettings",
+    },
+  });
+}
+
+function signIn({ code, phone, phone_code_hash }) {
+  return mtproto.call('auth.signIn', {
+    phone_code: code,
+    phone_number: phone,
+    phone_code_hash: phone_code_hash,
+  });
+}
+
+function signUp({ phone, phone_code_hash }) {
+  return mtproto.call('auth.signUp', {
+    phone_number: phone,
+    phone_code_hash: phone_code_hash,
+    first_name: 'MTProto',
+    last_name: 'Core',
+  });
+}
+
+function getPassword() {
+  return mtproto.call('account.getPassword');
+}
+
+function checkPassword({ srp_id, A, M1 }) {
+  return mtproto.call('auth.checkPassword', {
+    password: {
+      _: 'inputCheckPasswordSRP',
+      srp_id,
+      A,
+      M1,
+    },
+  });
+}
+
+ipcMain.handle("auth_tg", async (event, { phone, code, password }) => {
+  const user = await getUser();
+  if(!user){
+    const {phone_code_hash} = await sendCode(phone);
+    try {
+      const signInResult = await signIn({
+        code,
+        phone,
+        phone_code_hash,
+      });
+      if(signInResult._ === 'auth.authorizationSignUpRequired'){
+        await signUp({
+          phone, 
+          phone_code_hash,
+        });
+      }
+    }catch(error){
+      if(error.error_message !== 'SESSION_PASSWORD_NEEDED'){
+        console.log(`error:`, error);
+        return;
+      }
+      const {srp_id, current_algo, srp_B} = await getPassword();
+      const { g, p, salt1, salt2 } = current_algo;
+      const { A, M1 } = await mtproto.mtproto.crypto.getSRPParams({
+        g,
+        p,
+        salt1,
+        salt2,
+        gB: srp_B,
+        password,
+      });
+
+      const checkPasswordResult = await checkPassword({srp_id, A, M1});
+    }
   }
 });
 
-ipcMain.handle(
-  "access_code",
-  async (event, { phoneNumber, phoneCodeHash, code }) => {
-    const api_id = 29974513;
-    const api_hash = "0f843f086acdbf04af970bf4ab305768";
-
-    const mtproto = new MTProto({
-      api_id: api_id,
-      api_hash: api_hash,
-      storageOptions: {
-        path: path.resolve(__dirname, "session.json"),
-      },
-    });
-    try {
-      const result = await mtproto.call("auth.signIn", {
-        phone_number: phoneNumber,
-        phone_code_hash: phoneCodeHash,
-        phone_code: code,
-      });
-      return result;
-    } catch (e) {
-      throw e;
-    }
-  }
-);
-
 async function analyzeTelegram(url, startDate, endDate) {
-  const api_id = 29974513;
-  const api_hash = "0f843f086acdbf04af970bf4ab305768";
   const channelUsername = extractChannelUsername(url);
   console.log(channelUsername);
-  const mtproto = new MTProto({
-    api_id: api_id,
-    api_hash: api_hash,
-    storageOptions: {
-      path: path.resolve(__dirname, "session.json"),
-    },
-  });
+
   console.log("Method call is a", typeof mtproto.call);
 
   try {
