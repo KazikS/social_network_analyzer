@@ -2,10 +2,13 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 const axios = require("axios");
 const MTProto = require("@mtproto/core");
+const getSRPParams = require("@mtproto/core");
 const { sign } = require("node:crypto");
 
+let win;
+
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1000,
     height: 1000,
     webPreferences: {
@@ -17,7 +20,13 @@ const createWindow = () => {
   });
   win.loadFile("index.html");
   win.webContents.openDevTools();
+  checkUserStatus();
 };
+
+async function checkUserStatus() {
+  const user = await getUser();
+  win.webContents.send("user-status", user);
+}
 
 app.whenReady().then(() => {
   createWindow();
@@ -80,7 +89,7 @@ async function analyzeVK(url, startDate, endDate) {
 
   const filteredPosts = allPosts.filter((post) => {
     const postDate = new Date(post.date * 1000);
-    return postDate >= new Date(startDate) && postDate <= new Date(endDate);
+    return postDate >= start && postDate <= end;
   });
   const totalLikes = filteredPosts.reduce(
     (acc, post) => acc + (post.likes ? post.likes.count : 0),
@@ -136,40 +145,40 @@ async function getUser() {
   }
 }
 
-function sendCode(phone) {
+function sendCode(phoneNumber) {
   return mtproto.call("auth.sendCode", {
-    phone_number: phone,
+    phone_number: phoneNumber,
     settings: {
       _: "codeSettings",
     },
   });
 }
 
-function signIn({ code, phone, phone_code_hash }) {
-  return mtproto.call('auth.signIn', {
+function signIn({ code, phoneNumber, phone_code_hash }) {
+  return mtproto.call("auth.signIn", {
     phone_code: code,
-    phone_number: phone,
+    phone_number: phoneNumber,
     phone_code_hash: phone_code_hash,
   });
 }
 
-function signUp({ phone, phone_code_hash }) {
-  return mtproto.call('auth.signUp', {
-    phone_number: phone,
+function signUp({ phoneNumber, phone_code_hash }) {
+  return mtproto.call("auth.signUp", {
+    phone_number: phoneNumber,
     phone_code_hash: phone_code_hash,
-    first_name: 'MTProto',
-    last_name: 'Core',
+    first_name: "MTProto",
+    last_name: "Core",
   });
 }
 
 function getPassword() {
-  return mtproto.call('account.getPassword');
+  return mtproto.call("account.getPassword");
 }
 
 function checkPassword({ srp_id, A, M1 }) {
-  return mtproto.call('auth.checkPassword', {
+  return mtproto.call("auth.checkPassword", {
     password: {
-      _: 'inputCheckPasswordSRP',
+      _: "inputCheckPasswordSRP",
       srp_id,
       A,
       M1,
@@ -177,54 +186,133 @@ function checkPassword({ srp_id, A, M1 }) {
   });
 }
 
-ipcMain.handle("auth_tg", async (event, { phone, code, password }) => {
+ipcMain.handle("auth_tg", async (event, { phoneNumber, code, password }) => {
   const user = await getUser();
-  if(!user){
-    const {phone_code_hash} = await sendCode(phone);
+  console.log("User ", user);
+  console.log(phoneNumber);
+  if (user == null) {
+    const { phone_code_hash } = await sendCode(phoneNumber);
+    console.log("Phone code hash ", phone_code_hash);
     try {
       const signInResult = await signIn({
         code,
-        phone,
+        phoneNumber,
         phone_code_hash,
       });
-      if(signInResult._ === 'auth.authorizationSignUpRequired'){
+      if (signInResult._ === "auth.authorizationSignUpRequired") {
         await signUp({
-          phone, 
+          phoneNumber,
           phone_code_hash,
         });
       }
-    }catch(error){
-      if(error.error_message !== 'SESSION_PASSWORD_NEEDED'){
-        console.log(`error:`, error);
-        return;
-      }
-      const {srp_id, current_algo, srp_B} = await getPassword();
-      const { g, p, salt1, salt2 } = current_algo;
-      const { A, M1 } = await mtproto.mtproto.crypto.getSRPParams({
-        g,
-        p,
-        salt1,
-        salt2,
-        gB: srp_B,
-        password,
-      });
+    } catch (error) {
+      console.log(error);
+      // if (error.error_message !== "SESSION_PASSWORD_NEEDED") {
+      //   console.log(`error:`, error);
+      //   return;
+      // }
+      // const { srp_id, current_algo, srp_B } = await getPassword();
+      // const { g, p, salt1, salt2 } = current_algo;
+      // const { A, M1 } = await new getSRPParams({
+      //   g,
+      //   p,
+      //   salt1,
+      //   salt2,
+      //   gB: srp_B,
+      //   password,
+      // });
 
-      const checkPasswordResult = await checkPassword({srp_id, A, M1});
+      // const checkPasswordResult = await checkPassword({ srp_id, A, M1 });
     }
   }
 });
 
+async function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function analyzeTelegram(url, startDate, endDate) {
   const channelUsername = extractChannelUsername(url);
-  console.log(channelUsername);
-
-  console.log("Method call is a", typeof mtproto.call);
+  let allMessages = [];
+  let offsetId = 0;
+  let hasMoreMessages = true;
 
   try {
     const channelInfo = await mtproto.call("contacts.resolveUsername", {
       username: channelUsername,
     });
-    console.log(channelInfo);
+    const channelId = channelInfo.chats[0].id;
+    const accessHash = channelInfo.chats[0].access_hash;
+
+    while (hasMoreMessages) {
+      console.log(`Fetching messages with offset_id: ${offsetId}`);
+      try {
+        const messages = await mtproto.call("messages.getHistory", {
+          peer: {
+            _: "inputPeerChannel",
+            channel_id: channelId,
+            access_hash: accessHash,
+          },
+          offset_id: offsetId,
+          offset_date: 0,
+          add_offset: 0,
+          limit: 100,
+          max_id: 0,
+          min_id: 0,
+          hash: 0,
+        });
+
+        if (messages.messages.length === 0) {
+          console.log("No more messages to fetch");
+          hasMoreMessages = false;
+        } else {
+          allMessages = allMessages.concat(messages.messages);
+          offsetId = messages.messages[messages.messages.length - 1].id;
+          console.log(
+            `Fetched ${messages.messages.length} messages, next offset_id: ${offsetId}`
+          );
+        }
+      } catch (error) {
+        if (error.error_code === 420) {
+          const waitTime =
+            parseInt(error.error_message.split("_").pop(), 10) * 1000;
+          console.log(`Flood wait detected, waiting for ${waitTime} ms`);
+          await delay(waitTime);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    console.log("All messages:", allMessages);
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    const filteredMessages = allMessages.filter((msg) => {
+      const msgDate = new Date(msg.date * 1000);
+      return msgDate >= start && msgDate <= end;
+    });
+
+    console.log("Filtered messages:", filteredMessages);
+
+    let totalMessages = filteredMessages.length;
+    let totalViews = 0;
+    let totalReactions = 0;
+
+    filteredMessages.forEach((msg) => {
+      if (msg.views) totalViews += msg.views;
+      if (msg.reactions && msg.reactions.results) {
+        totalReactions += msg.reactions.results.length;
+      }
+    });
+
+    const dateDiff = Math.abs(end - start);
+    const weeks = dateDiff / (1000 * 60 * 60 * 24 * 7);
+    const avgPostsPerWeek = filteredMessages.length / weeks;
+    return { totalMessages, totalReactions, totalViews, avgPostsPerWeek };
   } catch (error) {
     console.error("Invalid query:", error);
     throw error;

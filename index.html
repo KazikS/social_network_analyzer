@@ -67,14 +67,13 @@
                     </div>
                     <div class="code">
                         <label for="code">Введите код подтверждения</label>
-                        <input id="code" name="code" type="text" maxlength="50" placeholder="XXXXX" disabled>
+                        <input id="code" name="code" type="text" maxlength="50" placeholder="XXXXX" >
                     </div>
                     <div class="password">
                         <label for="password">Введите пароль</label>
-                        <input id="password" name="password" type="password" maxlength="50" placeholder="" disabled>
+                        <input id="password" name="password" type="password" maxlength="50" placeholder="" >
                     </div>
-                    <input type="button" value="Отправить код" class="confirm_phone btn animated">
-                    <input type="button" value="Войти" class="confirm_code btn animated">
+                    <input type="button" value="Отправить код" class="auth-tg btn animated">
                     <p class="undefined-number">Аккаунта с этим номером не существует!</p>
                 </div>
                 <div class="inputs">
@@ -86,10 +85,10 @@
 
                 <div class="results">
                     <h3>Результаты:</h3>
-                    <p class="tgPosts">Количество постов: </p>
-                    <p class="tgLikes">Количество реакций: </p>
-                    <p class="tgViews">Количество просмотров: </p>
-                    <p class="tgAvgPostsPerWeek">Среднее количество публикаций в неделю: </p>
+                    <p id="tgPosts">Количество постов: </p>
+                    <p id="tgLikes">Количество реакций: </p>
+                    <p id="tgViews">Количество просмотров: </p>
+                    <p id="tgAvgPostsPerWeek">Среднее количество публикаций в неделю: </p>
                     <img src="./assets/img/loader-pic.svg" alt="loading" class="tg-load">
                 </div>
 

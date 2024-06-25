@@ -3,15 +3,30 @@ let analyzeTGbtn = document.querySelector(".analyze-tg");
 let vkLoad = document.querySelector(".vk-load");
 let tgLoad = document.querySelector(".tg-load");
 let confirmPhoneBtn = document.querySelector(".confirm_phone");
-let isVerifCodeIn = false;
-let verifCode = document.querySelector(".confirm_code");
-let confirmPasswordBtn = document.querySelector(".confirm_password");
+let authWindowTg = document.querySelector(".auth-form-tg");
+let verifCode = document.querySelector(".auth-tg");
+
+window.electronAPI.onUserStatus((event, user) => {
+  if (user == null) {
+    authWindowTg.style.display = "flex";
+  } else {
+    authWindowTg.style.display = "none";
+  }
+});
 
 verifCode.onclick = async () => {
   const phoneNumber = document.getElementById("online_phone").value;
   const code = document.getElementById("code").value;
   const password = document.getElementById("password");
-
+  console.log(verifCode);
+  try{
+    await window.electronAPI.auth_tg({phoneNumber, code, password});
+    authWindowTg.style.display = "none";
+  }catch(error){
+    document.querySelector(".undefined-number").style.display = "block";
+    document.querySelector(".undefined-number").textContent = "Ошибка ввода данных"
+  }
+  
 };
 
 analyzeVKbtn.onclick = () => {
@@ -66,13 +81,13 @@ async function analyzeStats(url, startDate, endDate) {
     vkLoad.classList.remove("spinning");
     vkLoad.style.display = "none";
   } else if (url.includes("t.me")) {
-    document.getElementById("vkPosts").textContent =
-      "Количество постов: " + result.filteredPosts.length;
-    document.getElementById("vkLikes").textContent =
-      "Количество лайков: " + result.totalLikes;
-    document.getElementById("vkViews").textContent =
+    document.getElementById("tgPosts").textContent =
+      "Количество постов: " + result.totalMessages;
+    document.getElementById("tgLikes").textContent =
+      "Количество лайков: " + result.totalReactions;
+    document.getElementById("tgViews").textContent =
       "Количество просмотров: " + result.totalViews;
-    document.getElementById("vkAvgPostsPerWeek").textContent =
+    document.getElementById("tgAvgPostsPerWeek").textContent =
       "Среднее количество публикаций в неделю: " +
       result.avgPostsPerWeek.toFixed(2);
     tgLoad.classList.remove("spinning");
