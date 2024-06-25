@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/KazikS/social_network_analyzer#readme",
   "devDependencies": {
-    "electron": "^31.0.1"
+    "electron": "^31.0.2"
   },
   "dependencies": {
     "@mtproto/core": "^6.3.0",
