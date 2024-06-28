@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@mtproto/core": "^6.3.0",
-    "axios": "^1.7.2"
+    "axios": "^1.7.2",
+    "mtproto": "^0.0.1"
   }
 }

@@ -4,30 +4,30 @@ let vkLoad = document.querySelector(".vk-load");
 let tgLoad = document.querySelector(".tg-load");
 let confirmPhoneBtn = document.querySelector(".confirm_phone");
 let authWindowTg = document.querySelector(".auth-form-tg");
-let verifCode = document.querySelector(".auth-tg");
+let authTg = document.querySelector(".auth-tg");
 
-window.electronAPI.onUserStatus((event, user) => {
-  if (user == null) {
-    authWindowTg.style.display = "flex";
-  } else {
-    authWindowTg.style.display = "none";
+window.electronAPI.onUserStatus((user)=>{
+  if(user){
+    authWindowTg.style.display = 'none';
+  }else{
+    authWindowTg.style.display = 'flex';
   }
-});
+})
 
-verifCode.onclick = async () => {
-  const phoneNumber = document.getElementById("online_phone").value;
+authTg.onclick = async () => {
+  const phone = document.getElementById("online_phone").value;
   const code = document.getElementById("code").value;
-  const password = document.getElementById("password");
-  console.log(verifCode);
-  try{
-    await window.electronAPI.auth_tg({phoneNumber, code, password});
-    authWindowTg.style.display = "none";
-  }catch(error){
+  const password = document.getElementById("password").value;
+  console.log("verifBtn clicked");
+  try {
+    await window.electronAPI.update_config({ phone, code, password });
+  } catch (error) {
     document.querySelector(".undefined-number").style.display = "block";
-    document.querySelector(".undefined-number").textContent = "Ошибка ввода данных"
+    document.querySelector(".undefined-number").textContent =
+      "Ошибка ввода данных";
   }
-  
 };
+
 
 analyzeVKbtn.onclick = () => {
   vkLoad.style.display = "block";
@@ -43,7 +43,7 @@ analyzeVKbtn.onclick = () => {
     startDate,
     "End Date:",
     endDate
-  ); // Логируем клик и даты
+  );
   analyzeStats(url, startDate, endDate);
 };
 
@@ -61,7 +61,7 @@ analyzeTGbtn.onclick = () => {
     startDate,
     "End Date:",
     endDate
-  ); // Логируем клик и даты
+  );
   analyzeStats(url, startDate, endDate);
 };
 

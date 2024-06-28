@@ -43,13 +43,7 @@
                     <img src="./assets/img/loader-pic.svg" alt="loading" class="vk-load">
                 </div>
             </div>
-            <div class="subs-dynamic">
-                <h3>Динамика подписчиков</h3>
-                <p>В позапрошлом месяце: </p>
-                <p>В прошлом месяце: </p>
-                <p>В этом месяце: </p>
-            </div>
-            <input type="button" value="Анализ" class="analyze-vk analyze-btn animated">
+            <input type="button" value="Анализ" class="analyze-vk analyze-btn btn animated">
         </div>
 
 
@@ -70,7 +64,7 @@
                         <input id="code" name="code" type="text" maxlength="50" placeholder="XXXXX" >
                     </div>
                     <div class="password">
-                        <label for="password">Введите пароль</label>
+                        <label for="password">Введите пароль (если есть)</label>
                         <input id="password" name="password" type="password" maxlength="50" placeholder="" >
                     </div>
                     <input type="button" value="Отправить код" class="auth-tg btn animated">
@@ -82,25 +76,16 @@
                     <input type="text" placeholder="Введите даты в формате: 'с YYYY-MM-DD до YYYY-MM-DD'"
                         class="tg-date" value="c 2024-06-10 до 2024-06-20">
                 </div>
-
                 <div class="results">
                     <h3>Результаты:</h3>
                     <p id="tgPosts">Количество постов: </p>
-                    <p id="tgLikes">Количество реакций: </p>
+                    <p id="tgLikes">Количество лайков: </p>
                     <p id="tgViews">Количество просмотров: </p>
                     <p id="tgAvgPostsPerWeek">Среднее количество публикаций в неделю: </p>
                     <img src="./assets/img/loader-pic.svg" alt="loading" class="tg-load">
                 </div>
-
             </div>
-            <div class="subs-dynamic">
-                <h3>Динамика подписчиков</h3>
-                <p>В позапрошлом месяце: </p>
-                <p>В прошлом месяце: </p>
-                <p>В этом месяце: </p>
-            </div>
-
-            <input type="button" value="Анализ" class="analyze-tg analyze-btn animated">
+            <input type="button" value="Анализ" class="analyze-tg analyze-btn btn animated">
         </div>
     </main>
     <script src="renderer.js"></script>

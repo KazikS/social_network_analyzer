@@ -1,9 +1,9 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 const axios = require("axios");
-const MTProto = require("@mtproto/core");
-const getSRPParams = require("@mtproto/core");
-const { sign } = require("node:crypto");
+const api = require("./telegram/tgApi");
+const auth = require("./telegram/auth");
+const getUser = require("./telegram/getUser");
 
 let win;
 
@@ -25,6 +25,7 @@ const createWindow = () => {
 
 async function checkUserStatus() {
   const user = await getUser();
+  console.log(user);
   win.webContents.send("user-status", user);
 }
 
@@ -121,111 +122,12 @@ async function analyzeVK(url, startDate, endDate) {
 
 //telegram
 
-const api_id = 29974513;
-const api_hash = "0f843f086acdbf04af970bf4ab305768";
-const mtproto = new MTProto({
-  api_id: api_id,
-  api_hash: api_hash,
-  storageOptions: {
-    path: path.resolve(__dirname, "session.json"),
-  },
+ipcMain.handle("update_config", async (event, data) => {
+  console.log(data);
+  auth(data.phone, data.code, data.password);
+
 });
 
-async function getUser() {
-  try {
-    const user = await mtproto.call("users.getFullUser", {
-      id: {
-        _: "inputUserSelf",
-      },
-    });
-
-    return user;
-  } catch (error) {
-    return null;
-  }
-}
-
-function sendCode(phoneNumber) {
-  return mtproto.call("auth.sendCode", {
-    phone_number: phoneNumber,
-    settings: {
-      _: "codeSettings",
-    },
-  });
-}
-
-function signIn({ code, phoneNumber, phone_code_hash }) {
-  return mtproto.call("auth.signIn", {
-    phone_code: code,
-    phone_number: phoneNumber,
-    phone_code_hash: phone_code_hash,
-  });
-}
-
-function signUp({ phoneNumber, phone_code_hash }) {
-  return mtproto.call("auth.signUp", {
-    phone_number: phoneNumber,
-    phone_code_hash: phone_code_hash,
-    first_name: "MTProto",
-    last_name: "Core",
-  });
-}
-
-function getPassword() {
-  return mtproto.call("account.getPassword");
-}
-
-function checkPassword({ srp_id, A, M1 }) {
-  return mtproto.call("auth.checkPassword", {
-    password: {
-      _: "inputCheckPasswordSRP",
-      srp_id,
-      A,
-      M1,
-    },
-  });
-}
-
-ipcMain.handle("auth_tg", async (event, { phoneNumber, code, password }) => {
-  const user = await getUser();
-  console.log("User ", user);
-  console.log(phoneNumber);
-  if (user == null) {
-    const { phone_code_hash } = await sendCode(phoneNumber);
-    console.log("Phone code hash ", phone_code_hash);
-    try {
-      const signInResult = await signIn({
-        code,
-        phoneNumber,
-        phone_code_hash,
-      });
-      if (signInResult._ === "auth.authorizationSignUpRequired") {
-        await signUp({
-          phoneNumber,
-          phone_code_hash,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      // if (error.error_message !== "SESSION_PASSWORD_NEEDED") {
-      //   console.log(`error:`, error);
-      //   return;
-      // }
-      // const { srp_id, current_algo, srp_B } = await getPassword();
-      // const { g, p, salt1, salt2 } = current_algo;
-      // const { A, M1 } = await new getSRPParams({
-      //   g,
-      //   p,
-      //   salt1,
-      //   salt2,
-      //   gB: srp_B,
-      //   password,
-      // });
-
-      // const checkPasswordResult = await checkPassword({ srp_id, A, M1 });
-    }
-  }
-});
 
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -238,7 +140,7 @@ async function analyzeTelegram(url, startDate, endDate) {
   let hasMoreMessages = true;
 
   try {
-    const channelInfo = await mtproto.call("contacts.resolveUsername", {
+    const channelInfo = await api.call("contacts.resolveUsername", {
       username: channelUsername,
     });
     const channelId = channelInfo.chats[0].id;
@@ -247,7 +149,7 @@ async function analyzeTelegram(url, startDate, endDate) {
     while (hasMoreMessages) {
       console.log(`Fetching messages with offset_id: ${offsetId}`);
       try {
-        const messages = await mtproto.call("messages.getHistory", {
+        const messages = await api.call("messages.getHistory", {
           peer: {
             _: "inputPeerChannel",
             channel_id: channelId,
