@@ -1,9 +1,9 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 const axios = require("axios");
-const api = require("./telegram/tgApi");
-const auth = require("./telegram/auth");
-const getUser = require("./telegram/getUser");
+const api = require("./tgApi");
+const auth = require("./auth");
+const getUser = require("./getUser");
 
 let win;
 
