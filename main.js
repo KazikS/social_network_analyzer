@@ -125,9 +125,8 @@ async function analyzeVK(url, startDate, endDate) {
 ipcMain.handle("update_config", async (event, data) => {
   console.log(data);
   auth(data.phone, data.code, data.password);
-
+  checkUserStatus();
 });
-
 
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -139,6 +138,13 @@ async function analyzeTelegram(url, startDate, endDate) {
   let offsetId = 0;
   let hasMoreMessages = true;
 
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+  const startDateTimestamp = start.getTime() / 1000;
+  const endDateTimestamp = end.getTime() / 1000;
+
   try {
     const channelInfo = await api.call("contacts.resolveUsername", {
       username: channelUsername,
@@ -147,7 +153,7 @@ async function analyzeTelegram(url, startDate, endDate) {
     const accessHash = channelInfo.chats[0].access_hash;
 
     while (hasMoreMessages) {
-      console.log(`Fetching messages with offset_id: ${offsetId}`);
+      console.log(`Fetching messages with offset_id: ${offsetId} and offset_date: ${endDateTimestamp}`);
       try {
         const messages = await api.call("messages.getHistory", {
           peer: {
@@ -156,7 +162,7 @@ async function analyzeTelegram(url, startDate, endDate) {
             access_hash: accessHash,
           },
           offset_id: offsetId,
-          offset_date: 0,
+          offset_date: endDateTimestamp, // запрос на получение сообщений до endDate
           add_offset: 0,
           limit: 100,
           max_id: 0,
@@ -168,16 +174,22 @@ async function analyzeTelegram(url, startDate, endDate) {
           console.log("No more messages to fetch");
           hasMoreMessages = false;
         } else {
-          allMessages = allMessages.concat(messages.messages);
+          const fetchedMessages = messages.messages.filter((msg) => msg.date >= startDateTimestamp);
+          allMessages = allMessages.concat(fetchedMessages);
           offsetId = messages.messages[messages.messages.length - 1].id;
+
           console.log(
-            `Fetched ${messages.messages.length} messages, next offset_id: ${offsetId}`
+            `Fetched ${fetchedMessages.length} messages, next offset_id: ${offsetId}`
           );
+
+          // Проверка, есть ли еще сообщения до startDate
+          if (messages.messages[messages.messages.length - 1].date < startDateTimestamp) {
+            hasMoreMessages = false;
+          }
         }
       } catch (error) {
         if (error.error_code === 420) {
-          const waitTime =
-            parseInt(error.error_message.split("_").pop(), 10) * 1000;
+          const waitTime = parseInt(error.error_message.split("_").pop(), 10) * 1000;
           console.log(`Flood wait detected, waiting for ${waitTime} ms`);
           await delay(waitTime);
         } else {
@@ -186,25 +198,13 @@ async function analyzeTelegram(url, startDate, endDate) {
       }
     }
 
-    console.log("All messages:", allMessages);
+    console.log("All fetched messages:", allMessages);
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    start.setHours(0, 0, 0, 0);
-    end.setHours(23, 59, 59, 999);
-
-    const filteredMessages = allMessages.filter((msg) => {
-      const msgDate = new Date(msg.date * 1000);
-      return msgDate >= start && msgDate <= end;
-    });
-
-    console.log("Filtered messages:", filteredMessages);
-
-    let totalMessages = filteredMessages.length;
+    let totalMessages = allMessages.length;
     let totalViews = 0;
     let totalReactions = 0;
 
-    filteredMessages.forEach((msg) => {
+    allMessages.forEach((msg) => {
       if (msg.views) totalViews += msg.views;
       if (msg.reactions && msg.reactions.results) {
         totalReactions += msg.reactions.results.length;
@@ -213,13 +213,15 @@ async function analyzeTelegram(url, startDate, endDate) {
 
     const dateDiff = Math.abs(end - start);
     const weeks = dateDiff / (1000 * 60 * 60 * 24 * 7);
-    const avgPostsPerWeek = filteredMessages.length / weeks;
+    const avgPostsPerWeek = totalMessages / weeks;
+
     return { totalMessages, totalReactions, totalViews, avgPostsPerWeek };
   } catch (error) {
     console.error("Invalid query:", error);
     throw error;
   }
 }
+
 
 async function extractGroupId(url, token, apiVersion) {
   const match = url.match(/vk\.com\/(?:public|club)(\d+)/);

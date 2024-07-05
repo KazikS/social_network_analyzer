@@ -6,13 +6,9 @@ let confirmPhoneBtn = document.querySelector(".confirm_phone");
 let authWindowTg = document.querySelector(".auth-form-tg");
 let authTg = document.querySelector(".auth-tg");
 
-window.electronAPI.onUserStatus((user)=>{
-  if(user){
-    authWindowTg.style.display = 'none';
-  }else{
-    authWindowTg.style.display = 'flex';
-  }
-})
+window.electronAPI.onUserStatus((event, user) => {
+  updateAuthWindowVisibility(user);
+});
 
 authTg.onclick = async () => {
   const phone = document.getElementById("online_phone").value;
@@ -21,13 +17,15 @@ authTg.onclick = async () => {
   console.log("verifBtn clicked");
   try {
     await window.electronAPI.update_config({ phone, code, password });
+    window.electronAPI.onUserStatus((event, user) => {
+      updateAuthWindowVisibility(user);
+    });
   } catch (error) {
     document.querySelector(".undefined-number").style.display = "block";
     document.querySelector(".undefined-number").textContent =
       "Ошибка ввода данных";
   }
 };
-
 
 analyzeVKbtn.onclick = () => {
   vkLoad.style.display = "block";
@@ -92,5 +90,14 @@ async function analyzeStats(url, startDate, endDate) {
       result.avgPostsPerWeek.toFixed(2);
     tgLoad.classList.remove("spinning");
     tgLoad.style.display = "none";
+  }
+}
+
+function updateAuthWindowVisibility(user) {
+  if (user) {
+    console.log(user);
+    authWindowTg.style.display = "none";
+  } else {
+    authWindowTg.style.display = "flex";
   }
 }
